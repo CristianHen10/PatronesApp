@@ -1,0 +1,24 @@
+﻿@if (!ShowForm)
+{
+    <div class="no_data_container">
+        <img src="images/no-data.png" alt="No hay datos que mostrar" />
+        <div class="no_data_content">
+            <DxButton Text="Crear un nuevo registro." SizeMode="SizeMode.Large" RenderStyle="ButtonRenderStyle.Light" 
+                      RenderStyleMode="ButtonRenderStyleMode.Text" @onclick="@(() => ShowForm = true)" />
+        </div>
+    </div>
+} else
+{
+    <div class="no_data_container_form">
+        @FormNewContent
+    </div>
+}
+
+
+@code {
+
+    bool ShowForm { get; set; } = false;
+    [Parameter]
+    public RenderFragment FormNewContent { get; set; }
+
+}

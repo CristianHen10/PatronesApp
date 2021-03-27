@@ -1,0 +1,129 @@
+﻿@page "/estudiantes"
+@inject IEstudiantesServices ServicesEstudiante
+
+<h2>Estudiantes</h2>
+
+<div>
+    @if (EstudiantesList == null)
+    {
+        <LoadingComponent />
+    }
+    else if (EstudiantesList.Count <= 0)
+    {
+        <NoDataComponent>
+            <FormNewContent>
+                <div>
+                    <EditForm Model="@ModelEstudiante" Context="EditContextEstudiante" OnValidSubmit="@OnHandleValidSubmit" OnInvalidSubmit="@OnHandleInvalidSubmit">
+                        <DataAnnotationsValidator />
+                        <DxFormLayout>
+                            <DxFormLayoutItem Caption="Primer Nombre:" ColSpanMd="6">
+                                <Template>
+                                    <DxTextBox @bind-Text="@ModelEstudiante.PrimerNombre" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Segundo Nombre:" ColSpanMd="6">
+                                <Template>
+                                    <DxTextBox @bind-Text="@ModelEstudiante.SegundoNombre" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Primer Apellido:" ColSpanMd="6">
+                                <Template>
+                                    <DxTextBox @bind-Text="@ModelEstudiante.PrimerApellido" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Segundo Apellido:" ColSpanMd="6">
+                                <Template>
+                                    <DxTextBox @bind-Text="@ModelEstudiante.SegundoApellido" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Edad:" ColSpanMd="6">
+                                <Template>
+                                    <DxSpinEdit @bind-Value="@ModelEstudiante.Edad" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Jornada de Clases:" ColSpanMd="6">
+                                <Template>
+                                    <DxComboBox Data="@(new string[] { "Diurno", "Tarde", "Nocturno" })" @bind-Value="@ModelEstudiante.JornadaClases" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Curso:" ColSpanMd="6">
+                                <Template>
+                                    <DxComboBox Data="@(new string[] { "Algebra Lineal", "POO", "Fundamentos de Diseño" })" @bind-Value="@ModelEstudiante.CursosAsignados" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem Caption="Fecha de Creación:" ColSpanMd="6">
+                                <Template>
+                                    <DxDateEdit @bind-Date="@ModelEstudiante.Ts" />
+                                </Template>
+                            </DxFormLayoutItem>
+                            <DxFormLayoutItem ColSpanMd="12">
+                                <Template>
+                                    <div class="content_action ">
+                                        <DxButton SubmitFormOnClick="true" SizeMode="SizeMode.Medium" CssClass="user_button_create"
+                                                  Text="Crear un nuevo usuario" RenderStyle="ButtonRenderStyle.Primary" />
+                                        <DxButton SizeMode="SizeMode.Medium"
+                                                  Text="Cancelar" RenderStyle="ButtonRenderStyle.Danger" />
+                                    </div>
+                                </Template>
+                            </DxFormLayoutItem>
+                        </DxFormLayout>
+                    </EditForm>
+                </div>
+            </FormNewContent>
+        </NoDataComponent>
+    }
+    else
+    {
+        <DxDataGrid Data="@EstudiantesList" PageSize="15" RowRemovingAsync="@OnRowRemoving">
+            <DxDataGridCommandColumn Width="100px" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.PrimerNombre)" Caption="Primer Nombre" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.SegundoNombre)" Caption="Segundo Nombre" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.PrimerApellido)" Caption="Primer Apellido" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.SegundoApellido)" Caption="Segundo Apellido" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.Edad)" Caption="Edad" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.CursosAsignados)" Caption="Curso Asignado" />
+            <DxDataGridColumn Field="@nameof(Estudiantes.JornadaClases)" Caption="Jornada de Clases" />
+        </DxDataGrid>
+    }
+</div>
+
+@code {
+
+    List<Estudiantes> EstudiantesList { get; set; } = new List<Estudiantes>();
+    Estudiantes ModelEstudiante = new Estudiantes();
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var response = await ServicesEstudiante.GetAllEstudiantes();
+            EstudiantesList = response.ToList();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    async Task OnHandleValidSubmit()
+    {
+        try
+        {
+            await ServicesEstudiante.SaveEstudiante(ModelEstudiante);
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Message from OnHandleValidSubmit" + ex.Message);
+        }
+    }
+
+    async Task OnHandleInvalidSubmit()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task OnRowRemoving(Estudiantes dataItem)
+    {
+        await ServicesEstudiante.DeleteEstudiante(dataItem.IdEstudiante);
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

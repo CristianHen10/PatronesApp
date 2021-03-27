@@ -1,0 +1,30 @@
+﻿.no_data_container {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.no_data_text {
+    display: flex;
+    justify-content: center;
+}
+
+    .no_data_text h2 {
+        font-family: 'Roboto' sans-serif;
+        font-weight: bold;
+    }
+
+.no_data_content_anim {
+    display: flex;
+    justify-content: center;
+}
+
+.no_data_content {
+    display:flex;
+    justify-content: center;
+}
+
+.no_data_container_form {
+    margin-top: 20px;
+}
